@@ -16,15 +16,7 @@ let player = {
   h: paddleH,
   speed: playerSpeed
 };
-let cpu = {
-  x: canvasW - 20,
-  y: 200,
-  w: paddleW,
-  h: paddleH,
-  maxSpeed: cpuMaxSpeed,
-  missFramesLeft: 0,
-  missTargetY: 200
-};
+let cpu = {\n  x: canvasW - 20,\n  y: 200,\n  w: paddleW,\n  h: paddleH,\n  maxSpeed: cpuMaxSpeed,\n  missFramesLeft: 0,\n  missTargetY: 200\n};
 let ball = {
   x: canvasW / 2,
   y: canvasH / 2,
@@ -46,11 +38,7 @@ function resetBall(){
   ball.vx = initialBallVX * (random() < 0.5 ? 1 : -1);
   ball.vy = initialBallVY * (random() < 0.5 ? 1 : -1);
 }
-function clamp(v, a, b){
-  if(v < a) return a;
-  if(v > b) return b;
-  return v;
-}
+function clamp(v, a, b){\n  if(v < a) return a;\n  if(v > b) return b;\n  return v;\n}
 function draw(){
   background(20);
   fill(255);
@@ -119,6 +107,6 @@ function draw(){
   fill(255);
   rect(player.x, player.y, player.w, player.h);
   rect(cpu.x, cpu.y, cpu.w, cpu.h);
-  fill(255, 204, 0);
+  fill(255,0,0);
   ellipse(ball.x, ball.y, ball.r * 2, ball.r * 2);
 }
