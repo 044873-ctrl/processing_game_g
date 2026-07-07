@@ -1,32 +1,7 @@
-var canvasW=400;
-var canvasH=600;
-var playerX=0;
-var playerY=0;
-var playerSpeed=5;
-var playerRadius=12;
-var lives=3;
-var bullets=[];
-var enemies=[];
-var particles=[];
-var stars=[];
-var score=0;
-var prevSpace=false;
-var gameOver=false;
-function rectCircleCollides(rx,ry,rw,rh,cx,cy,cr){var halfW=rw/2;var halfH=rh/2;var closestX=cx; if(closestX<rx-halfW)closestX=rx-halfW; if(closestX>rx+halfW)closestX=rx+halfW; var closestY=cy; if(closestY<ry-halfH)closestY=ry-halfH; if(closestY>ry+halfH)closestY=ry+halfH; var dx=cx-closestX; var dy=cy-closestY; return dx*dx+dy*dy<=cr*cr;}
-function initStars(){for(var i=0;i<30;i++){var s={x:random(0,canvasW),y:random(0,canvasH),r:random(1,3),speed:random(0.5,2)};stars.push(s);}}
-function updateStars(){for(var i=0;i<stars.length;i++){var s=stars[i];s.y+=s.speed;if(s.y>canvasH){s.x=random(0,canvasW);s.y=random(-canvasH,0);s.r=random(1,3);s.speed=random(0.5,2);}}}
-function spawnEnemies(){if(frameCount%60===0){var e={x:random(12,canvasW-12),y:-12,r:12,speed:2};enemies.push(e);}}
-function handleInput(){if(keyIsDown(LEFT_ARROW)){playerX-=playerSpeed;}if(keyIsDown(RIGHT_ARROW)){playerX+=playerSpeed;}if(playerX<playerRadius){playerX=playerRadius;}if(playerX>canvasW-playerRadius){playerX=canvasW-playerRadius;}if(keyIsDown(32)){if(!prevSpace){var b={x:playerX,y:playerY-playerRadius-9,w:6,h:18};bullets.push(b);prevSpace=true;}}else{prevSpace=false;}}
-function updateBullets(){for(var i=bullets.length-1;i>=0;i--){var b=bullets[i];b.y-=8;if(b.y<-b.h/2){bullets.splice(i,1);continue;}var hit=false;for(var j=enemies.length-1;j>=0;j--){var e=enemies[j];if(rectCircleCollides(b.x,b.y,b.w,b.h,e.x,e.y,e.r)){spawnExplosion(e.x,e.y);enemies.splice(j,1);bullets.splice(i,1);score+=10;hit=true;break;}}if(hit){continue;}}}
-function updateEnemies(){for(var i=enemies.length-1;i>=0;i--){var e=enemies[i];e.y+=e.speed;if(e.y>canvasH+e.r){enemies.splice(i,1);}}}
-function updateParticles(){for(var i=particles.length-1;i>=0;i--){var p=particles[i];p.x+=p.vx;p.y+=p.vy;p.life--;if(p.life<=0){particles.splice(i,1);}}}
-function checkPlayerEnemyCollision(){if(gameOver){return;}for(var i=enemies.length-1;i>=0;i--){var e=enemies[i];var dx=e.x-playerX;var dy=e.y-playerY;var rr=e.r+playerRadius;if(dx*dx+dy*dy<=rr*rr){spawnExplosion(e.x,e.y);enemies.splice(i,1);lives--;playerX=canvasW/2;playerY=canvasH-40;if(lives<=0){gameOver=true;}}}}
-function spawnExplosion(x,y){for(var i=0;i<5;i++){var angle=random(0,Math.PI*2);var speed=random(1,3);var p={x:x,y:y,vx:Math.cos(angle)*speed,vy:Math.sin(angle)*speed,r:3,life:20};particles.push(p);}}
-function drawStars(){noStroke();fill(255);for(var i=0;i<stars.length;i++){var s=stars[i];ellipse(s.x,s.y,s.r,s.r);}}
-function drawPlayer(){if(gameOver){return;}fill(0,0,255);noStroke();ellipse(playerX,playerY,playerRadius*2,playerRadius*2);}
-function drawBullets(){rectMode(CENTER);fill(255,255,0);noStroke();for(var i=0;i<bullets.length;i++){var b=bullets[i];rect(b.x,b.y,b.w,b.h);}rectMode(CORNER);}
-function drawEnemies(){fill(255,0,0);noStroke();for(var i=0;i<enemies.length;i++){var e=enemies[i];ellipse(e.x,e.y,e.r*2,e.r*2);}}
-function drawParticles(){noStroke();for(var i=0;i<particles.length;i++){var p=particles[i];fill(255,150,0,map(p.life,0,20,0,255));ellipse(p.x,p.y,p.r*2,p.r*2);}}
-function drawUI(){fill(255);textSize(16);text('Score: '+score,10,20);text('Lives: '+lives,10,40);if(gameOver){textSize(32);text('GAME OVER',canvasW/2-100,canvasH/2);}}
-function setup(){createCanvas(canvasW,canvasH);playerX=canvasW/2;playerY=canvasH-40;initStars();}
-function draw(){background(0);updateStars();if(!gameOver){handleInput();spawnEnemies();updateBullets();updateEnemies();updateParticles();checkPlayerEnemyCollision();}drawStars();drawPlayer();drawBullets();drawEnemies();drawParticles();drawUI();}
+let player,bullets,enemies,particles,stars,score,tick,gameOver;
+function setup(){createCanvas(400,600);player={x:width/2,y:height-30,r:12,speed:5};bullets=[];enemies=[];particles=[];stars=[];score=0;tick=0;gameOver=false;for(let i=0;i<30;i++){stars.push({x:random(0,width),y:random(0,height),r:random(1,3),speed:random(0.5,2)})}textSize(16);textAlign(LEFT,TOP);noStroke();}
+function draw(){background(0);for(let i=stars.length-1;i>=0;i--){let s=stars[i];fill(255);ellipse(s.x,s.y,s.r,s.r);s.y+=s.speed;if(s.y>height){s.y=0;s.x=random(0,width);s.r=random(1,3);s.speed=random(0.5,2)}}if(!gameOver){if(keyIsDown(LEFT_ARROW)){player.x-=player.speed}if(keyIsDown(RIGHT_ARROW)){player.x+=player.speed}player.x=constrain(player.x,player.r,width-player.r);tick++;if(tick%60===0){let ex=random(player.r,width-player.r);enemies.push({x:ex,y:-12,r:12,vy:2})}for(let i=enemies.length-1;i>=0;i--){let e=enemies[i];e.y+=e.vy;if(e.y>height+e.r){enemies.splice(i,1);continue}let d=dist(e.x,e.y,player.x,player.y);if(d<=e.r+player.r){gameOver=true}}for(let i=bullets.length-1;i>=0;i--){let b=bullets[i];b.y+=b.vy;if(b.y<-b.r){bullets.splice(i,1);continue}}for(let i=enemies.length-1;i>=0;i--){let e=enemies[i];let hit=false;for(let j=bullets.length-1;j>=0;j--){let b=bullets[j];let d=dist(e.x,e.y,b.x,b.y);if(d<=e.r+b.r){for(let k=0;k<5;k++){let ang=random(0,TWO_PI);let sp=random(1,3);particles.push({x:e.x,y:e.y,r:3,life:20,vx:cos(ang)*sp,vy:sin(ang)*sp})}enemies.splice(i,1);bullets.splice(j,1);score++;hit=true;break}}if(hit){continue}}}
+for(let i=particles.length-1;i>=0;i--){let p=particles[i];p.life--;p.x+=p.vx;p.y+=p.vy;if(p.life<=0){particles.splice(i,1);continue}let alpha=map(p.life,0,20,0,255);fill(255,150,0,alpha);ellipse(p.x,p.y,p.r,p.r)}
+for(let i=0;i<enemies.length;i++){let e=enemies[i];fill(200,0,0);ellipse(e.x,e.y,e.r*2,e.r*2)}for(let i=0;i<bullets.length;i++){let b=bullets[i];fill(0,200,255);ellipse(b.x,b.y,b.r*2,b.r*2)}fill(0,255,0);ellipse(player.x,player.y,player.r*2,player.r*2);fill(255);text('Score: '+score,8,8);if(gameOver){fill(255,0,0);textSize(32);textAlign(CENTER,CENTER);text('GAME OVER',width/2,height/2)}}
+function keyPressed(){if(!gameOver){if(keyCode===32){bullets.push({x:player.x,y:player.y-player.r,r:4,vy:-8})}}if(gameOver&&key==='r'){restart()}}
+function restart(){player.x=width/2;player.y=height-30;bullets=[];enemies=[];particles=[];score=0;tick=0;gameOver=false}
